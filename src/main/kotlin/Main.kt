@@ -13,10 +13,11 @@ import dev.kord.core.event.interaction.InteractionCreateEvent
 import dev.kord.core.event.message.MessageCreateEvent
 import dev.kord.core.on
 import dev.kord.rest.builder.message.create.embed
+import dev.kord.x.emoji.Emojis
+import dev.kord.x.emoji.addReaction
 import kotlinx.coroutines.delay
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import utils.Emojis
 
 val logger: Logger = LoggerFactory.getLogger("bigbluebot")
 
@@ -56,7 +57,7 @@ suspend fun main() {
         when (args[0]) {
             "b!ping" -> {
                 val response = message.channel.createMessage("Pong!")
-                response.addReaction(Emojis.LAPTOP)
+                response.addReaction(Emojis.desktopComputer)
 
                 delay(5000)
                 message.delete()
