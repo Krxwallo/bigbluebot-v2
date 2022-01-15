@@ -3,3 +3,4 @@
 /.gradle/
 secrets.json
 config.json
+users.json
