@@ -1,6 +1,6 @@
 package commands
 
-import config.users
+import config.discordUsers
 import debugChannel
 import dev.kord.common.Color
 import dev.kord.common.entity.Permission
@@ -21,7 +21,7 @@ val bbbCommands = listOf(
     }) {
         val name = command.options["name"]?.string()!!
         acknowledgeEphemeral().followUp {
-            users[member.id.toString()] = name
+            discordUsers[member.id.toString()] = name
             embed {
                 color = Color(0, 255, 0)
                 title = "Successful Link"

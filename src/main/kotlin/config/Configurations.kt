@@ -29,7 +29,7 @@ var discordConfig = DiscordConfig()
 val discordConfigFile = configFile("discord")
 
 @Serializable
-var users = hashMapOf<String, String>() // discord member id -> BBB name
+var discordUsers = hashMapOf<String, String>() // discord member id -> BBB name
 val usersFile = configFile("users")
 
 @Serializable

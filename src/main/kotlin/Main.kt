@@ -19,8 +19,8 @@ import dev.kord.core.on
 import dev.kord.rest.builder.message.EmbedBuilder
 import dev.kord.rest.builder.message.modify.embed
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import web.conference
@@ -37,7 +37,7 @@ lateinit var debugChannel: TextChannel
 lateinit var messagesChannel: TopGuildMessageChannel
 lateinit var updateStatusTask: Timer
 
-suspend fun main() = runBlocking {
+suspend fun main() = coroutineScope {
     loadConfigs()
 
     kord = Kord(secrets.token)
@@ -73,8 +73,8 @@ suspend fun main() = runBlocking {
 suspend fun guildMember(id: String) = testGuild.getMember(Snowflake(id))
 
 private suspend fun linkedUsers(): String {
-    val string = StringBuilder("Linked users: (${users.size})\n")
-    users.forEach { (id, bbbName) ->
+    val string = StringBuilder("Linked users: (${discordUsers.size})\n")
+    discordUsers.forEach { (id, bbbName) ->
         string.append("- ${guildMember(id).mention}: $bbbName\n")
     }
     return "$string-> Link your discord and BigBlueButton account with `/link`!"
@@ -88,9 +88,9 @@ suspend fun updateStatus(offline: Boolean = false) {
                     ${linkedUsers()}
                     
                     Current conference: **$conference**
-                    Users in conference: **${web.users.size}**
-                    Talking users: **${web.users.filterValues { !it }.size}**
-                    Muted users: **${web.users.filterValues { it }.size}**
+                    Users in conference: **${web.bbbUsers.size}**
+                    Talking users: **${web.bbbUsers.filterValues { !it }.size}**
+                    Muted users: **${web.bbbUsers.filterValues { it }.size}**
                     
                     -------------------------------
                     
@@ -122,12 +122,30 @@ suspend fun updateStatus(offline: Boolean = false) {
     }
 }
 
+suspend fun HashMap<String, Boolean>.update(name: String, mutedValue: Boolean) {
+    this[name] = mutedValue
+    // Maybe update discord mute status
+    if (discordUsers.containsValue(name)) discordUsers.forEach {
+        if (it.value == name) testGuild.getMember(Snowflake(it.key)).edit {
+            muted = !mutedValue
+        }
+    }
+}
+
 suspend fun shutdown() {
     logger.info("Shutting down...")
     updateStatusTask.cancel()
     updateStatus(true)
     saveConfigs()
-    kord.shutdown()
     stopBrowser()
+    resetDiscordUsers() // Unmute discord ppl
+    kord.shutdown()
     logger.info("Bye")
+}
+
+suspend fun resetDiscordUsers() = discordUsers.forEach {
+    testGuild.getMember(Snowflake(it.key)).edit {
+        muted = false
+        deafened = false
+    }
 }

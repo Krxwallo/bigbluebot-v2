@@ -2,24 +2,30 @@ package web
 
 import config.secrets
 import io.github.bonigarcia.wdm.WebDriverManager
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 import logger
 import org.openqa.selenium.By
+import org.openqa.selenium.NoSuchSessionException
 import org.openqa.selenium.firefox.FirefoxDriver
+import resetDiscordUsers
+import update
 import java.util.*
-import kotlin.concurrent.timer
 
 lateinit var driver: FirefoxDriver
 lateinit var task: Timer
 var courses = hashMapOf<String, String>() // name to href
 var conference: String? = null // Currently in no conference
-val users: HashMap<String, Boolean> = hashMapOf() // name to muted
+val bbbUsers: HashMap<String, Boolean> = hashMapOf() // name to muted
 
-private fun clearTabs() {
+private suspend fun clearTabs() {
     driver.windowHandles.forEachIndexed { index, s ->
         if (index != 0) driver.switchTo().window(s).close()
     }
     conference = null
     driver.switchTo().window(driver.windowHandles.first())
+
+    resetDiscordUsers() // Unmute discord ppl
 }
 
 private fun login() {
@@ -32,44 +38,42 @@ private fun login() {
     }
 }
 
-suspend fun startBrowser() {
+suspend fun startBrowser() = runBlocking {
     logger.info("Starting firefox browser")
     WebDriverManager.firefoxdriver().setup()
     driver = FirefoxDriver()
     login()
 
-    task = timer(period = 100L) {
-        // Update conference stuff etc
-        val webElements = driver.findElements(By.cssSelector("div[class^=\"userItemContents\"]"))
-        driver.findElements(By.className("icon_bbb_close")).forEach {
-            // Close popup
-            it.click()
-        }
-        if (webElements.size == 1) {
-            if (users.isNotEmpty()) users.clear()
-        }
-        else {
-            webElements.forEach {
-                val name = it.findElement(By.cssSelector("span[class^=\"userNameMain\"]")).text
-                val avatarClasses = it.findElement(By.cssSelector("div[class^=\"avatar\"]")).getDomAttribute("class")
-                val muted = "noVoice" in avatarClasses || "listenOnly" in avatarClasses || "muted" in avatarClasses
-                if ("(" !in it.text) {
-                    // Assign muted value
-                    if (it.text !in users) {
-                        users[it.text] = muted
-
+    while (true) {
+        try {
+            // Update conference stuff etc
+            val webElements = driver.findElements(By.cssSelector("div[class^=\"userItemContents\"]"))
+            if (webElements.size == 1) {
+                if (bbbUsers.isNotEmpty()) bbbUsers.clear()
+            } else {
+                webElements.forEach {
+                    val name = it.findElement(By.cssSelector("span[class^=\"userNameMain\"]")).text.trimEnd()
+                    val avatarClasses = it.findElement(By.cssSelector("div[class^=\"avatar\"]")).getDomAttribute("class")
+                    val muted = "noVoice" in avatarClasses || "listenOnly" in avatarClasses || "muted" in avatarClasses
+                    if ("(" !in name) {
+                        // Assign muted value
+                        if (name !in bbbUsers) bbbUsers.update(name, muted)
+                        else if (bbbUsers[name] != muted) bbbUsers.update(name, muted)
+                        // Don't update when the status didn't change
                     }
-                    users[it.text] = muted
-
-                    // TODO update mute on discord
                 }
             }
+            delay(100)
+        }
+        catch (e: NoSuchSessionException) {
+            logger.warn("No session")
+            break
         }
     }
 }
 
 /** @return null when no error occurred / the error string */
-fun joinConference(name: String): String? {
+suspend fun joinConference(name: String): String? {
     clearTabs()
     conference = null
     if (name !in courses) return "Course not found"
@@ -86,10 +90,11 @@ fun joinConference(name: String): String? {
 }
 
 /** @return old conference string when conference was left / null when there was no conference to leave */
-fun leaveConference(): String? = conference?.apply { clearTabs() }
+suspend fun leaveConference(): String? = conference?.apply {
+    clearTabs()
+}
 
 fun stopBrowser() {
-    task.cancel()
     conference = null
     driver.quit()
 }
