@@ -35,7 +35,7 @@ val bbbCommands = listOf(
         string("name", "The name of the conference") {
             required = true
             //TODO correct choices
-            choice("Deutsch", "10a-D-Bg-2022")
+
         }
     }) {
         if (!hasPermission(Permission.Administrator)) return@Command
@@ -99,6 +99,9 @@ val bbbCommands = listOf(
                     -> Link your discord and BigBlueButton account with `/link`!
                     
                     Current conference: **$conference**
+                    Users in conference: **${web.users.size}**
+                    Talking users: **${web.users.filterValues { !it }.size}**
+                    Muted users: **${web.users.filterValues { it }.size}**
                     
                     More information coming soon...
                     

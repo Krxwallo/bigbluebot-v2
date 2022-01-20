@@ -12,7 +12,7 @@ lateinit var driver: FirefoxDriver
 lateinit var task: Timer
 var courses = hashMapOf<String, String>() // name to href
 var conference: String? = null // Currently in no conference
-lateinit var users: ArrayList<User>
+val users: HashMap<String, Boolean> = hashMapOf() // name to muted
 
 private fun clearTabs() {
     driver.windowHandles.forEachIndexed { index, s ->
@@ -40,7 +40,26 @@ fun startBrowser() {
 
     task = timer(period = 100L) {
         // TODO update conference stuff etc
-
+        val webElements = driver.findElements(By.cssSelector("div[class^=\"userItemContents\"]"))
+        driver.findElements(By.className("icon_bbb_close")).forEach {
+            // Close popup
+            it.click()
+        }
+        if (webElements.size == 1) {
+            if (users.isNotEmpty()) users.clear()
+        }
+        else {
+            webElements.forEach {
+                val name = it.findElement(By.cssSelector("span[class^=\"userNameMain\"]")).text
+                val avatarClasses = it.findElement(By.cssSelector("div[class^=\"avatar\"]")).getDomAttribute("class")
+                val muted = "noVoice" in avatarClasses || "listenOnly" in avatarClasses || "muted" in avatarClasses
+                if ("(" !in it.text) {
+                    // Assign muted value
+                    users[it.text] = muted
+                    // TODO update mute on discord
+                }
+            }
+        }
     }
 }
 
@@ -57,6 +76,7 @@ fun joinConference(name: String): String? {
     conferences[0].findElement(By.tagName("a")).click()
     driver.findElement(By.id("join_button_input")).click()
     conference = name
+    driver.switchTo().window(driver.windowHandles.elementAt(1)) // Switch to conference screen
     return null
 }
 
