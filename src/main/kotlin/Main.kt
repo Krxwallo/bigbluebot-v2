@@ -1,7 +1,7 @@
 @file:Suppress("EXPERIMENTAL_API_USAGE")
 
 import commands.registerCommands
-import config.config
+import config.discordConfig
 import config.loadConfigs
 import config.saveConfigs
 import config.secrets
@@ -12,11 +12,14 @@ import dev.kord.core.behavior.getChannelOf
 import dev.kord.core.behavior.reply
 import dev.kord.core.entity.Guild
 import dev.kord.core.entity.channel.TextChannel
+import dev.kord.core.event.gateway.ReadyEvent
 import dev.kord.core.event.message.MessageCreateEvent
 import dev.kord.core.on
-import kotlinx.coroutines.runBlocking
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import web.startBrowser
+import web.stopBrowser
+import kotlin.concurrent.thread
 
 val logger: Logger = LoggerFactory.getLogger("bigbluebot")
 
@@ -24,12 +27,12 @@ lateinit var kord: Kord
 lateinit var testGuild: Guild
 lateinit var debugChannel: TextChannel
 
-suspend fun main() = runBlocking {
+suspend fun main() {
     loadConfigs()
 
     kord = Kord(secrets.token)
-    testGuild = kord.getGuild(Snowflake(config.testGuild))!!
-    debugChannel = testGuild.getChannelOf(Snowflake(config.debugChannel))
+    testGuild = kord.getGuild(Snowflake(discordConfig.testGuild))!!
+    debugChannel = testGuild.getChannelOf(Snowflake(discordConfig.debugChannel))
 
     registerCommands()
 
@@ -40,6 +43,15 @@ suspend fun main() = runBlocking {
             }
     }
 
+    kord.on<ReadyEvent> {
+        kord.editPresence {
+            listening("dem Lehrer")
+        }
+    }
+
+    // Selenium
+    thread { startBrowser() }
+
     logger.info("Logging in...")
     kord.login()
 }
@@ -48,5 +60,6 @@ suspend fun shutdown() {
     logger.info("Shutting down...")
     saveConfigs()
     kord.shutdown()
+    stopBrowser()
     logger.info("Bye")
 }

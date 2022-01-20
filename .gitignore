@@ -1,6 +1,4 @@
 /build/
 /.idea/
 /.gradle/
-secrets.json
-config.json
-users.json
+/config/

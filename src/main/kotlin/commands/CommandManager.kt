@@ -1,5 +1,6 @@
 package commands
 
+import config.discordConfig
 import dev.kord.common.Color
 import dev.kord.common.entity.Permission
 import dev.kord.core.behavior.interaction.followUp
@@ -10,6 +11,7 @@ import dev.kord.rest.builder.interaction.BaseInputChatBuilder
 import dev.kord.rest.builder.message.create.embed
 import kord
 import logger
+import testGuild
 
 data class Command(
     val name: String,
@@ -19,10 +21,19 @@ data class Command(
 )
 
 suspend fun registerCommands() {
-    kord.createGlobalApplicationCommands {
+    kord.globalCommands.collect {
+        it.delete()
+    }
+    if (discordConfig.testMode) kord.createGuildApplicationCommands(testGuild.id) {
         bbbCommands.forEach {
             input(it.name, it.description, it.builder)
             logger.info("Created '${it.name}' command.")
+        }
+    }
+    else kord.createGlobalApplicationCommands {
+        bbbCommands.forEach {
+            input(it.name, it.description, it.builder)
+            logger.debug("Created '${it.name}' command.")
         }
     }
 

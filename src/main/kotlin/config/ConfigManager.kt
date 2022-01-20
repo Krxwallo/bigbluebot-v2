@@ -4,6 +4,7 @@ import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import logger
+import java.io.File
 
 private val json = Json {
     prettyPrint = true
@@ -13,26 +14,22 @@ private val json = Json {
     ignoreUnknownKeys = true
 }
 
+/**
+ * @return true if file exists else false
+ */
+private inline fun <reified T> checkFile(file: File, data: T, required: Boolean = false): Boolean = if (!file.exists()) {
+    file.writeText(json.encodeToString(data))
+    if (required) error("Configure ${file.name} before using.") // Throw error
+    // Show warning/info
+    logger.info("${file.name} doesn't exist. Creating new one.")
+    false
+} else true
+
 fun loadConfigs() {
-    if (!secretsFile.exists()) {
-        secretsFile.writeText(json.encodeToString(secrets))
-        error("Configure secrets.json before using.")
-    }
-    secrets = json.decodeFromString(secretsFile.readText())
-    logger.debug("Loaded secrets")
-
-    if (!configFile.exists()) {
-        configFile.writeText(json.encodeToString(config))
-        error("Configure config.json before using.")
-    }
-    config = json.decodeFromString(configFile.readText())
-    logger.debug("Loaded config")
-
-    if (!usersFile.exists()) {
-        usersFile.writeText(json.encodeToString(users))
-        logger.warn("users.json doesn't exist. Creating new file")
-    }
-    else users = json.decodeFromString(usersFile.readText())
+    if (checkFile(secretsFile, secrets, true)) secrets = json.decodeFromString(secretsFile.readText())
+    if (checkFile(discordConfigFile, discordConfig, true)) discordConfig = json.decodeFromString(discordConfigFile.readText())
+    if (checkFile(usersFile, users)) users = json.decodeFromString(usersFile.readText())
+    if (checkFile(moodleFile, moodle)) moodle = json.decodeFromString(moodleFile.readText())
 }
 
 fun saveConfigs() {
