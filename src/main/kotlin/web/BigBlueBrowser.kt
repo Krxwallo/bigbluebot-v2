@@ -32,14 +32,14 @@ private fun login() {
     }
 }
 
-fun startBrowser() {
+suspend fun startBrowser() {
     logger.info("Starting firefox browser")
     WebDriverManager.firefoxdriver().setup()
     driver = FirefoxDriver()
     login()
 
     task = timer(period = 100L) {
-        // TODO update conference stuff etc
+        // Update conference stuff etc
         val webElements = driver.findElements(By.cssSelector("div[class^=\"userItemContents\"]"))
         driver.findElements(By.className("icon_bbb_close")).forEach {
             // Close popup
@@ -55,7 +55,12 @@ fun startBrowser() {
                 val muted = "noVoice" in avatarClasses || "listenOnly" in avatarClasses || "muted" in avatarClasses
                 if ("(" !in it.text) {
                     // Assign muted value
+                    if (it.text !in users) {
+                        users[it.text] = muted
+
+                    }
                     users[it.text] = muted
+
                     // TODO update mute on discord
                 }
             }

@@ -28,11 +28,13 @@ private inline fun <reified T> checkFile(file: File, data: T, required: Boolean 
 fun loadConfigs() {
     if (checkFile(secretsFile, secrets, true)) secrets = json.decodeFromString(secretsFile.readText())
     if (checkFile(discordConfigFile, discordConfig, true)) discordConfig = json.decodeFromString(discordConfigFile.readText())
+    if (checkFile(moodleFile, moodle, true)) moodle = json.decodeFromString(moodleFile.readText())
     if (checkFile(usersFile, users)) users = json.decodeFromString(usersFile.readText())
-    if (checkFile(moodleFile, moodle)) moodle = json.decodeFromString(moodleFile.readText())
+    if (checkFile(messagesFile, messages)) messages = json.decodeFromString(messagesFile.readText())
 }
 
 fun saveConfigs() {
     usersFile.writeText(json.encodeToString(users))
+    messagesFile.writeText(json.encodeToString(messages))
     logger.info("Saved users.")
 }

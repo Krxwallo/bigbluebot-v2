@@ -21,7 +21,7 @@ val secretsFile = configFile("secrets")
 data class DiscordConfig(
     val testGuild: String = "TEST_GUILD",
     val debugChannel: String = "DEBUG_CHANNEL",
-    val rulesChannel: String = "RULES_CHANNEL",
+    val messagesChannel: String = "MESSAGES_CHANNEL",
     val testMode: Boolean = false,
 )
 
@@ -29,7 +29,7 @@ var discordConfig = DiscordConfig()
 val discordConfigFile = configFile("discord")
 
 @Serializable
-var users = hashMapOf<String, String>()
+var users = hashMapOf<String, String>() // discord member id -> BBB name
 val usersFile = configFile("users")
 
 @Serializable
@@ -39,3 +39,11 @@ data class Moodle(
 
 var moodle = Moodle()
 val moodleFile = configFile("moodle")
+
+@Serializable
+data class Messages(
+    var status: String? = null
+)
+
+var messages = Messages()
+var messagesFile = configFile("messages")

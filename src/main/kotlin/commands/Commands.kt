@@ -12,7 +12,6 @@ import dev.kord.rest.builder.message.create.embed
 import dev.kord.rest.builder.message.modify.embed
 import kotlinx.coroutines.flow.count
 import shutdown
-import web.conference
 import web.joinConference
 import web.leaveConference
 
@@ -85,32 +84,6 @@ val bbbCommands = listOf(
                     color = Color(255, 255, 0)
                     title = "Error"
                     description = "No conference to leave"
-                }
-            }
-        }
-    },
-    Command("info", "Spit out some information") {
-        acknowledgePublic().followUp {
-            embed {
-                color = Color(0, 255, 0)
-                title = "BigBlueBot Information"
-                description = """
-                    Linked users: **${users.size}**
-                    -> Link your discord and BigBlueButton account with `/link`!
-                    
-                    Current conference: **$conference**
-                    Users in conference: **${web.users.size}**
-                    Talking users: **${web.users.filterValues { !it }.size}**
-                    Muted users: **${web.users.filterValues { it }.size}**
-                    
-                    More information coming soon...
-                    
-                    -------------------------------
-                    
-                    Developed by [Krxwallo](https://github.com/Krxwallo/) | [Source Code](https://github.com/Krxwallo/bigbluebot-v2)
-                """.trimIndent()
-                footer {
-                    text = ""
                 }
             }
         }
