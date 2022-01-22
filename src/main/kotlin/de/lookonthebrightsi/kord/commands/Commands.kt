@@ -1,4 +1,4 @@
-package de.lookonthebrightsi.commands
+package de.lookonthebrightsi.kord.commands
 
 import de.lookonthebrightsi.config.discordUsers
 import de.lookonthebrightsi.debugChannel
@@ -76,7 +76,7 @@ val bbbCommands = listOf(
                 embed {
                     color = Color(0, 255, 0)
                     title = "Successful"
-                    description = "Left **$it**"
+                    description = "Left **${it.name}**"
                 }
             } ?: run {
                 // There was no conference to leave

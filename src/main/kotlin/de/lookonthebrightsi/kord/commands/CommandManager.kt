@@ -1,4 +1,4 @@
-package de.lookonthebrightsi.commands
+package de.lookonthebrightsi.kord.commands
 
 import de.lookonthebrightsi.config.discordConfig
 import de.lookonthebrightsi.kord

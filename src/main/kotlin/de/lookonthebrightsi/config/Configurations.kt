@@ -21,7 +21,8 @@ val secretsFile = configFile("secrets")
 data class DiscordConfig(
     val testGuild: String = "TEST_GUILD",
     val debugChannel: String = "DEBUG_CHANNEL",
-    val messagesChannel: String = "MESSAGES_CHANNEL",
+    val statusChannel: String = "MESSAGES_CHANNEL",
+    val conferenceChatChannel: String = "CONFERENCE_CHAT_CHANNEL",
     val testMode: Boolean = false,
 )
 
