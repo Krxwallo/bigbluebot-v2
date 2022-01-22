@@ -1,7 +1,12 @@
 @file:Suppress("EXPERIMENTAL_API_USAGE")
 
-import commands.registerCommands
-import config.*
+package de.lookonthebrightsi
+
+import de.lookonthebrightsi.commands.registerCommands
+import de.lookonthebrightsi.config.*
+import de.lookonthebrightsi.web.conference
+import de.lookonthebrightsi.web.startBrowser
+import de.lookonthebrightsi.web.stopBrowser
 import dev.kord.common.Color
 import dev.kord.common.entity.Snowflake
 import dev.kord.core.Kord
@@ -23,9 +28,6 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import web.conference
-import web.startBrowser
-import web.stopBrowser
 import java.util.*
 import kotlin.concurrent.timer
 
@@ -88,9 +90,9 @@ suspend fun updateStatus(offline: Boolean = false) {
                     ${linkedUsers()}
                     
                     Current conference: **$conference**
-                    Users in conference: **${web.bbbUsers.size}**
-                    Talking users: **${web.bbbUsers.filterValues { !it }.size}**
-                    Muted users: **${web.bbbUsers.filterValues { it }.size}**
+                    Users in conference: **${de.lookonthebrightsi.web.bbbUsers.size}**
+                    Talking users: **${de.lookonthebrightsi.web.bbbUsers.filterValues { !it }.size}**
+                    Muted users: **${de.lookonthebrightsi.web.bbbUsers.filterValues { it }.size}**
                     
                     -------------------------------
                     

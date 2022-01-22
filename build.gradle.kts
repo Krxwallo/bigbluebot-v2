@@ -9,6 +9,9 @@ plugins {
 
 group = "de.lookonthebrightsi"
 version = "2.0.0"
+application {
+    mainClass.set("de.lookonthebrightsi.MainKt")
+}
 
 repositories {
     mavenCentral()
@@ -28,8 +31,4 @@ dependencies {
 
 tasks.withType<KotlinCompile> {
     kotlinOptions.jvmTarget = "1.8"
-}
-
-application {
-    mainClass.set("MainKt")
 }

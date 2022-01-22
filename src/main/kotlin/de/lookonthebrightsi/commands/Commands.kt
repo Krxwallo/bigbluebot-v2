@@ -1,7 +1,10 @@
-package commands
+package de.lookonthebrightsi.commands
 
-import config.discordUsers
-import debugChannel
+import de.lookonthebrightsi.config.discordUsers
+import de.lookonthebrightsi.debugChannel
+import de.lookonthebrightsi.shutdown
+import de.lookonthebrightsi.web.joinConference
+import de.lookonthebrightsi.web.leaveConference
 import dev.kord.common.Color
 import dev.kord.common.entity.Permission
 import dev.kord.core.behavior.interaction.edit
@@ -11,9 +14,6 @@ import dev.kord.rest.builder.interaction.string
 import dev.kord.rest.builder.message.create.embed
 import dev.kord.rest.builder.message.modify.embed
 import kotlinx.coroutines.flow.count
-import shutdown
-import web.joinConference
-import web.leaveConference
 
 val bbbCommands = listOf(
     Command("link", "Link your BigBlueButton username to BigBlueBot", {

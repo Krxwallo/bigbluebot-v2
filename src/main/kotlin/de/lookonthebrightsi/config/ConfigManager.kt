@@ -1,9 +1,9 @@
-package config
+package de.lookonthebrightsi.config
 
+import de.lookonthebrightsi.logger
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import logger
 import java.io.File
 
 private val json = Json {

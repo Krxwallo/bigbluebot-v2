@@ -1,6 +1,9 @@
-package commands
+package de.lookonthebrightsi.commands
 
-import config.discordConfig
+import de.lookonthebrightsi.config.discordConfig
+import de.lookonthebrightsi.kord
+import de.lookonthebrightsi.logger
+import de.lookonthebrightsi.testGuild
 import dev.kord.common.Color
 import dev.kord.common.entity.Permission
 import dev.kord.core.behavior.interaction.followUp
@@ -9,9 +12,6 @@ import dev.kord.core.event.interaction.InteractionCreateEvent
 import dev.kord.core.on
 import dev.kord.rest.builder.interaction.BaseInputChatBuilder
 import dev.kord.rest.builder.message.create.embed
-import kord
-import logger
-import testGuild
 
 data class Command(
     val name: String,

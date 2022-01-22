@@ -1,16 +1,16 @@
-package web
+package de.lookonthebrightsi.web
 
-import config.secrets
+import de.lookonthebrightsi.config.secrets
+import de.lookonthebrightsi.logger
+import de.lookonthebrightsi.resetDiscordUsers
+import de.lookonthebrightsi.update
 import io.github.bonigarcia.wdm.WebDriverManager
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
-import logger
 import org.openqa.selenium.By
 import org.openqa.selenium.NoSuchSessionException
 import org.openqa.selenium.firefox.FirefoxDriver
 import org.openqa.selenium.firefox.FirefoxOptions
-import resetDiscordUsers
-import update
 import java.util.*
 
 lateinit var driver: FirefoxDriver
@@ -30,7 +30,7 @@ private suspend fun clearTabs() {
 }
 
 private fun login() {
-    driver.get(config.moodle.loginPage)
+    driver.get(de.lookonthebrightsi.config.moodle.loginPage)
     driver.findElement(By.id("username")).sendKeys(secrets.moodleUser)
     driver.findElement(By.id("password")).sendKeys(secrets.moodlePassword)
     driver.findElement(By.id("loginbtn")).click()
