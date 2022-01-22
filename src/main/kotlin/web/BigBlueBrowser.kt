@@ -8,6 +8,7 @@ import logger
 import org.openqa.selenium.By
 import org.openqa.selenium.NoSuchSessionException
 import org.openqa.selenium.firefox.FirefoxDriver
+import org.openqa.selenium.firefox.FirefoxOptions
 import resetDiscordUsers
 import update
 import java.util.*
@@ -41,7 +42,9 @@ private fun login() {
 suspend fun startBrowser() = runBlocking {
     logger.info("Starting firefox browser")
     WebDriverManager.firefoxdriver().setup()
-    driver = FirefoxDriver()
+    driver = FirefoxDriver(FirefoxOptions().apply {
+        setHeadless(true)
+    })
     login()
 
     while (true) {
