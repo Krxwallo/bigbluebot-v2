@@ -19,7 +19,7 @@ private val json = Json {
  */
 private inline fun <reified T> checkFile(file: File, data: T, required: Boolean = false): Boolean = if (!file.exists()) {
     file.writeText(json.encodeToString(data))
-    if (required) error("Configure ${file.name} before using.") // Throw error
+    if (required) error("Configure ${file.name} before using. Should be in '${file.absolutePath}'") // Throw error
     // Show warning/info
     logger.info("${file.name} doesn't exist. Creating new one.")
     false
