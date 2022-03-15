@@ -10,7 +10,6 @@ data class ChatMessage(val sender: String, val content: String, val time: String
 
 suspend fun ChatMessage.sendToDiscord() {
     conferenceChatChannel.createEmbed {
-        println("Creating msg")
         title = sender
         description = content
         footer { text = "At $time in ${conference?.name}" }

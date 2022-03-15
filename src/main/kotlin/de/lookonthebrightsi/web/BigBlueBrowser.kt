@@ -8,8 +8,8 @@ import de.lookonthebrightsi.web.entities.Conference
 import de.lookonthebrightsi.web.entities.sendToDiscord
 import de.lookonthebrightsi.web.entities.toChatMessage
 import io.github.bonigarcia.wdm.WebDriverManager
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.runBlocking
 import org.openqa.selenium.By
 import org.openqa.selenium.NoSuchSessionException
 import org.openqa.selenium.WebDriverException
@@ -32,8 +32,11 @@ private suspend fun clearTabs() {
     resetDiscordUsers() // Unmute discord ppl
 }
 
-private fun login() {
+private suspend fun login() {
     driver.get(de.lookonthebrightsi.config.moodle.loginPage)
+
+    delay(1000)
+
     driver.findElement(By.id("username")).sendKeys(secrets.moodleUser)
     driver.findElement(By.id("password")).sendKeys(secrets.moodlePassword)
     driver.findElement(By.id("loginbtn")).click()
@@ -42,11 +45,11 @@ private fun login() {
     }
 }
 
-suspend fun startBrowser() = runBlocking {
+suspend fun startBrowser() = coroutineScope {
     logger.info("Starting firefox browser")
     WebDriverManager.firefoxdriver().setup()
     driver = FirefoxDriver(FirefoxOptions().apply {
-        setHeadless(true)
+        setHeadless(false)
     })
     login()
 

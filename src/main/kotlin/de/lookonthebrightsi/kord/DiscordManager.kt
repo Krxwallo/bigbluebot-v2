@@ -4,38 +4,44 @@ import de.lookonthebrightsi.*
 import de.lookonthebrightsi.config.discordUsers
 import de.lookonthebrightsi.config.messages
 import de.lookonthebrightsi.web.conference
+import de.lookonthebrightsi.web.startBrowser
 import dev.kord.common.Color
 import dev.kord.common.entity.Snowflake
-import dev.kord.core.any
+import dev.kord.common.exception.RequestException
 import dev.kord.core.behavior.channel.createEmbed
 import dev.kord.core.behavior.edit
 import dev.kord.core.behavior.reply
 import dev.kord.core.event.gateway.ReadyEvent
 import dev.kord.core.event.message.MessageCreateEvent
-import dev.kord.core.on
+import dev.kord.core.exception.EntityNotFoundException
 import dev.kord.rest.builder.message.EmbedBuilder
 import dev.kord.rest.builder.message.modify.embed
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import kotlin.concurrent.timer
 
 suspend fun loginKord() {
-    kord.on<MessageCreateEvent> {
-        if (message.mentionedUsers.any { it.id == kord.selfId })
+    bot.on<MessageCreateEvent> {
+        if (message.mentionedUsers.firstOrNull { it.id == kord.selfId } != null)
             message.reply {
                 content = "Hör auf mich zu pingen sonst bann ich dich"
             }
     }
 
-    kord.on<ReadyEvent> {
-        kord.editPresence {
-            listening("dem Lehrer")
-        }
+    bot.on<ReadyEvent> {
+        launch(Dispatchers.IO) { startBrowser() }
+
         updateStatusTask = timer(period = 3000L) {
             launch { updateStatus() }
         }
+
+        kord.editPresence {
+            listening("dem Lehrer")
+        }
     }
 
-    kord.login()
+    bot.start()
 }
 
 suspend fun resetDiscordUsers() = discordUsers.forEach {
@@ -84,15 +90,18 @@ suspend fun updateStatus(offline: Boolean = false) {
         }
     }
 
-    if (messages.status == null) messages.status = statusChannel.createEmbed { embed() }.id.toString()
+    if (messages.status == null) messages.status = statusChannel.createEmbed { embed() }.id.asString
     else {
         try {
             val msg = statusChannel.getMessage(Snowflake(messages.status!!))
             msg.edit { embed { embed() } }
         }
-        catch (e: Exception) {
+        catch (e: EntityNotFoundException) {
             logger.warn("Status Message not found")
-            messages.status = statusChannel.createEmbed { embed() }.id.toString()
+            messages.status = statusChannel.createEmbed { embed() }.id.asString
+        }
+        catch (e: RequestException) {
+            logger.warn("Error getting status message: ${e.stackTraceToString()}")
         }
     }
 }
